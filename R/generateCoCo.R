@@ -48,6 +48,33 @@ names(bs.coef.all)[8:14] <- c("X1","Y1","X2","Y2","c","w","sig.sd")
 for(i in 2:14) {bs.coef.all[,i] <- as.numeric(as.character(bs.coef.all[,i]))}
 bs.coef.all$locus <- colnames(dat@tab)
 
+## add Sotka et al 2004 Mol Ecol data
+sot <- read.delim('data/Sotka2004MolEcol-hapFreq.txt')
+### COI.C
+sot$percCOI.C <- sot$COI.C/(sot$COI.A+sot$COI.B+sot$COI.C)
+plt <- data.frame(lat=sot$lat,percCOI.C=sot$percCOI.C)
+  plt <- plt[complete.cases(plt),]
+  bs.fit <- bs(plt[,1],plt[,2])
+  flt.fit<- flt(plt[,1],plt[,2])
+  sig.fit <- sig(plt[,1],plt[,2])
+  cf <- bs.fit$par[1:4]
+  clnpar <- extract.bs(bs.fit$par)
+  lrt1 <- c(G1=2*abs(bs.fit$value-flt.fit$value),p.val1=(1-pchisq(2*abs(bs.fit$value-flt.fit$value),3)))
+  lrt2 <- c(G2=2*abs(bs.fit$value-sig.fit$value),p.val2=(1-pchisq(2*abs(bs.fit$value-sig.fit$value),1)))
+  bs.coef.all <- rbind(bs.coef.all,c(locus=names(plt)[2],clnpar,lrt1,lrt2,cf,sig.fit$par))
+  ### EFI.C
+  sot$percEF1.C <- sot$EF1.C/(sot$EF1.A+sot$EF1.B+sot$EF1.C)
+  plt <- data.frame(lat=sot$lat,percEF1.C=sot$percEF1.C)
+  plt <- plt[complete.cases(plt),]
+  bs.fit <- bs(plt[,1],plt[,2])
+  flt.fit<- flt(plt[,1],plt[,2])
+  sig.fit <- sig(plt[,1],plt[,2])
+  cf <- bs.fit$par[1:4]
+  clnpar <- extract.bs(bs.fit$par)
+  lrt1 <- c(G1=2*abs(bs.fit$value-flt.fit$value),p.val1=(1-pchisq(2*abs(bs.fit$value-flt.fit$value),3)))
+  lrt2 <- c(G2=2*abs(bs.fit$value-sig.fit$value),p.val2=(1-pchisq(2*abs(bs.fit$value-sig.fit$value),1)))
+  bs.coef.all <- rbind(bs.coef.all,c(locus=names(plt)[2],clnpar,lrt1,lrt2,cf,sig.fit$par))
+  
 write.table(file="output/May19.snps-CoCo.cline-parameters.csv",sep=',',row.names=F,bs.coef.all)
 
 

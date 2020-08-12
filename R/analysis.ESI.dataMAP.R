@@ -23,7 +23,7 @@ slice.dist <- 0.1
 
 ### clines
 clines <- read.csv('output/May19.snps-CoCo.cline-parameters.csv')
-#lat.slices <- hist(clines$mid,col="grey",breaks = seq(30,60,slice.width)) # latitudinal slices 
+lat.slices <- hist(clines$mid,col="grey",breaks = seq(30,60,slice.width)) # latitudinal slices 
 out <- data.frame(mids=lat.slices$mids,clines.density=lat.slices$density)
 
 prop.rocky <- c()
@@ -44,6 +44,10 @@ for (i in 1:dim(out)[1])
 out$prop.rocky <- prop.rocky
 out <- out[!(is.na(out$prop.rocky) | out$clines.density==0),]
 
+### add percent cover from PISCO
+### output from PISCOdata.R
+
+xbar <- read.csv("output/PISCOdata-Balanus.csv")
 
 
 library(maps)
@@ -65,4 +69,6 @@ text(-115,42.5,"rocky",col="black",cex=0.5)
 #text(x=rep(-118.5,3),y=c(42.5,41.5,40.5),c("16%","33%","50%"),pos=4)
 points(x=rep(-116,dim(out)[1]),y=out$mids,pch=20,cex=out$clines.density*7,co="blue") 
 text(-116,42.5,"clines",col="blue",cex=0.5)
+points(x=rep(-117,dim(xbar)[1]),y=xbar$latitude,pch=20,cex=xbar$MeanPercCover/3,col="red")
+text(-117,42.5,"% Cover",col="red",cex=0.5)
 dev.off()
